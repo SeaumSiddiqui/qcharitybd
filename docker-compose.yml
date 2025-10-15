@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - qcbd_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.2
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://mysql:3306/kcdb
+      KC_HOSTNAME: https://qcharitybd.com
+      KC_PROXY: edge
+    command: ["start", "--hostname-strict=false", "--http-enabled=true", "--http-port=8080"]
+    depends_on:
+      - mysql
+    networks:
+      - qcbd_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  qcbd-api:
+    build:
+      context: ./qcbd-api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./qcbd-api/.env
+      - ./.env
+    depends_on:
+      - mysql
+      - keycloak
+    networks:
+      - qcbd_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5050/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  qcbd-ui:
+    build:
+      context: ./qcbd-ui
+      dockerfile: Dockerfile
+      args:
+        BUILD_ENV: production
+    restart: unless-stopped
+    depends_on:
+      - qcbd-api
+      - keycloak
+    networks:
+      - qcbd_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # optional local debug port (uncomment to test locally)
+    # ports:
+    #   - "8080:80"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - qcbd-ui
+      - qcbd-api
+      - keycloak
+    networks:
+      - qcbd_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  qcbd_network:
+
+volumes:
+  mysql_data:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,35 @@
+# Secrets & env (root .env contains DB & Keycloak & AWS secret values — DO NOT COMMIT)
+.env
+.env.*
+!.env.example
+
+# Ignore the separated project repos
+qcbd-api/
+qcbd-ui/
+
+# Docker data / runtime
+# (do not commit local volume directories or cert caches)
+qcbd-ui/certbot/
+certbot/
+caddy_data/
+caddy_config/
+mysql_data/
+docker-data/
+volumes/
+*.pid
+*.log
+
+# Certificates (if present)
+*.pem
+*.key
+*.crt
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Misc backups
+*.bak

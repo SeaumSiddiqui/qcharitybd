@@ -1,0 +1,32 @@
+# Git and metadata
+.git
+.gitignore
+
+# IDE and OS
+.vscode
+.idea
+.DS_Store
+
+# Node and build caches
+node_modules
+dist
+build
+
+# Maven build outputs
+qcbd-api/target
+
+# Env files (never send secrets to Docker)
+.env
+.env.*
+*.env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docs
+*.md
+LICENSE
+README.md

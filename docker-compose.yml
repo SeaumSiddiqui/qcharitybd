@@ -50,11 +50,11 @@ services:
 
   qcbd-api:
     build:
-      context: ./qcbd-api
+      context: /home/seaum/qcbd-api
       dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
-      - ./qcbd-api/.env
+      - ../qcbd-api/.env
       - ./.env
     depends_on:
       - mysql
@@ -74,7 +74,7 @@ services:
 
   qcbd-ui:
     build:
-      context: ./qcbd-ui
+      context: /home/seaum/qcbd-ui
       dockerfile: Dockerfile
       args:
         BUILD_ENV: production

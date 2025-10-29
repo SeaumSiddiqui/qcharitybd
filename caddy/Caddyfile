@@ -1,21 +1,24 @@
-# caddy/Caddyfile
+{
+  email seaumsiddiqui0@gmail.com
+}
+
 qcharitybd.com, www.qcharitybd.com {
-    # Serve SPA: proxy root requests to the internal nginx in qcbd-ui
-    handle_path / {
-        reverse_proxy qcbd_ui:80
+    encode gzip
+
+    @api path /api/*
+    handle @api {
+        reverse_proxy qcbd-api:5050
     }
 
-    # API proxy
-    handle_path /api/* {
-        reverse_proxy qcbd_api:5050
-    }
-
-    # Keycloak
-    handle_path /auth/* {
+    @auth path /auth/*
+    handle @auth {
         reverse_proxy keycloak:8080
     }
 
-    # Optional: add header security via Caddy (simple example)
+    handle {
+        reverse_proxy qcbd-ui:80
+    }
+
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains"
         X-Frame-Options "SAMEORIGIN"

@@ -1,22 +1,14 @@
-{
-  email seaumsiddiqui0@gmail.com
-}
-
 qcharitybd.com, www.qcharitybd.com {
-    encode gzip
-
-    @api path /api/*
-    handle @api {
-        reverse_proxy qcbd-api:5050
+    handle_path / {
+        reverse_proxy qcbd_ui:80
     }
 
-    @auth path /auth/*
-    handle @auth {
+    handle_path /api/* {
+        reverse_proxy qcbd_api:5050
+    }
+
+    handle_path /auth/* {
         reverse_proxy keycloak:8080
-    }
-
-    handle {
-        reverse_proxy qcbd-ui:80
     }
 
     header {

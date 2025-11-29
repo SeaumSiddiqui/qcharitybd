@@ -1,16 +1,26 @@
 qcharitybd.com, www.qcharitybd.com {
-    handle_path / {
-        reverse_proxy qcbd_ui:80
-    }
 
+    # API proxy
     handle_path /api/* {
-        reverse_proxy qcbd_api:5050
+        reverse_proxy qcbd-api:5050
     }
 
+    # Bypass SPA for Keycloak admin console
+    handle_path /auth/admin/* {
+        reverse_proxy keycloak:8080
+    }
+
+    # Keycloak proxy
     handle_path /auth/* {
         reverse_proxy keycloak:8080
     }
 
+    # SPA proxy
+    handle_path /* {
+        reverse_proxy qcbd-ui:80
+    }
+
+    # Security headers
     header {
         Strict-Transport-Security "max-age=31536000; includeSubDomains"
         X-Frame-Options "SAMEORIGIN"

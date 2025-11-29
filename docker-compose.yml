@@ -28,7 +28,7 @@ services:
     environment:
       KC_DB: mysql
       KC_DB_URL: jdbc:mysql://mysql:3306/kcdb
-      KC_HOSTNAME: https://qcharitybd.com
+      KC_HOSTNAME: https://qcharitybd.com/auth
       KC_PROXY: edge
     command: ["start", "--hostname-strict=false", "--http-enabled=true", "--http-port=8080"]
     depends_on:

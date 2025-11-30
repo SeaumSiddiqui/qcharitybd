@@ -6,7 +6,7 @@ qcharitybd.com, www.qcharitybd.com {
     }
 
     # Bypass SPA for Keycloak admin console
-    handle_path /auth/admin/* {
+    handle_path /admin/* {
         reverse_proxy keycloak:8080
     }
 

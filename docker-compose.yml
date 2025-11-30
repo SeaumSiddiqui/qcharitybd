@@ -4,6 +4,12 @@ services:
     restart: unless-stopped
     env_file:
       - ./.env
+    environment:
+      # Mysql image will read these (env_file already sets them) but being explicit helps
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -28,7 +34,13 @@ services:
     environment:
       KC_DB: mysql
       KC_DB_URL: jdbc:mysql://mysql:3306/kcdb
-      KC_HOSTNAME: https://qcharitybd.com/auth
+      # ensure Keycloak gets the DB credentials (explicit mapping to .env)
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      # admin bootstrap (still in .env too)
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HOSTNAME: keycloak
       KC_PROXY: edge
     command: ["start", "--hostname-strict=false", "--http-enabled=true", "--http-port=8080"]
     depends_on:
@@ -87,9 +99,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    # optional local debug port (uncomment to test locally)
-    # ports:
-    #   - "8080:80"
 
   caddy:
     image: caddy:2

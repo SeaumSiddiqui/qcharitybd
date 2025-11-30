@@ -1,6 +1,7 @@
 services:
   mysql:
     image: mysql:8.0
+    container_name: mysql
     restart: unless-stopped
     env_file:
       - ./.env
@@ -27,6 +28,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.2
+    container_name: keycloak
     restart: unless-stopped
     env_file:
       - ./.env
@@ -58,6 +60,7 @@ services:
       retries: 5
 
   qcbd-api:
+    container_name: qcbd-api
     build:
       context: /home/seaum/qcbd-api
       dockerfile: Dockerfile
@@ -82,6 +85,7 @@ services:
       retries: 5
 
   qcbd-ui:
+    container_name: qcbd-ui
     build:
       context: /home/seaum/qcbd-ui
       dockerfile: Dockerfile
@@ -101,6 +105,7 @@ services:
 
   caddy:
     image: caddy:2
+    container_name: caddy
     restart: unless-stopped
     ports:
       - "80:80"

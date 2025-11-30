@@ -5,17 +5,22 @@ qcharitybd.com, www.qcharitybd.com {
         reverse_proxy qcbd-api:5050
     }
 
-    # Bypass SPA for Keycloak admin console
+    # Keycloak Admin Console (Keycloak 25+)
     handle_path /admin/* {
         reverse_proxy keycloak:8080
     }
 
-    # Keycloak proxy
+    # Keycloak Realm + Auth endpoints
+    handle_path /realms/* {
+        reverse_proxy keycloak:8080
+    }
+
+    # Legacy /auth paths (optional but harmless)
     handle_path /auth/* {
         reverse_proxy keycloak:8080
     }
 
-    # SPA proxy
+    # SPA (React)
     handle_path /* {
         reverse_proxy qcbd-ui:80
     }

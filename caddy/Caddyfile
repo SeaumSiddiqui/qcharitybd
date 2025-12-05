@@ -1,28 +1,33 @@
 qcharitybd.com, www.qcharitybd.com {
 
     # API proxy
-    handle_path /api/* {
-        reverse_proxy qcbd-api:5050
+    handle /api/* {
+        reverse_proxy charity-portal-api:5050
     }
 
-    # Keycloak Admin Console (Keycloak 25+)
-    handle_path /admin/* {
+    # Keycloak Admin Console
+    handle /admin/* {
+        reverse_proxy keycloak:8080
+    }
+
+    # Keycloak resources
+    handle /resources/* {
         reverse_proxy keycloak:8080
     }
 
     # Keycloak Realm + Auth endpoints
-    handle_path /realms/* {
+    handle /realms/* {
         reverse_proxy keycloak:8080
     }
 
-    # Legacy /auth paths (optional but harmless)
-    handle_path /auth/* {
+    # Legacy /auth paths
+    handle /auth/* {
         reverse_proxy keycloak:8080
     }
 
     # SPA (React)
     handle_path /* {
-        reverse_proxy qcbd-ui:80
+        reverse_proxy charity-portal-ui:80
     }
 
     # Security headers

@@ -14,7 +14,7 @@ services:
       - mysql_data:/var/lib/mysql
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
-      - qcbd_network
+      - charity_portal_network
     logging:
       driver: "json-file"
       options:
@@ -47,7 +47,7 @@ services:
     depends_on:
       - mysql
     networks:
-      - qcbd_network
+      - charity_portal_network
     logging:
       driver: "json-file"
       options:
@@ -59,44 +59,44 @@ services:
       timeout: 10s
       retries: 5
 
-  qcbd-api:
-    container_name: qcbd-api
+  charity-portal-api:
+    container_name: charity-portal-api
     build:
-      context: /home/seaum/qcbd-api
+      context: /home/seaum/charity-portal-api
       dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
-      - ../qcbd-api/.env
+      - ../charity-portal-api/.env
       - ./.env
     depends_on:
       - mysql
       - keycloak
     networks:
-      - qcbd_network
+      - charity_portal_network
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:5050/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+#    healthcheck:
+#      test: ["CMD-SHELL", "wget -qO- http://localhost:5050/actuator/health || exit 1"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
 
-  qcbd-ui:
-    container_name: qcbd-ui
+  charity-portal-ui:
+    container_name: charity-portal-ui
     build:
-      context: /home/seaum/qcbd-ui
+      context: /home/seaum/charity-portal-ui
       dockerfile: Dockerfile
       args:
         BUILD_ENV: production
     restart: unless-stopped
     depends_on:
-      - qcbd-api
+      - charity-portal-api
       - keycloak
     networks:
-      - qcbd_network
+      - charity_portal_network
     logging:
       driver: "json-file"
       options:
@@ -115,11 +115,11 @@ services:
       - caddy_config:/config
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
     depends_on:
-      - qcbd-ui
-      - qcbd-api
+      - charity-portal-ui
+      - charity-portal-api
       - keycloak
     networks:
-      - qcbd_network
+      - charity_portal_network
     logging:
       driver: "json-file"
       options:
@@ -127,7 +127,7 @@ services:
         max-file: "3"
 
 networks:
-  qcbd_network:
+  charity_portal_network:
 
 volumes:
   mysql_data:
